@@ -16,6 +16,7 @@ class UTargetable : public UInterface
 /**
  * 
  */
+ /* 타겟이 가능한 오브젝트일 경우 구현해서 사용하세요. */
 class LOWPOLYDUNGEON_API ITargetable
 {
 	GENERATED_BODY()

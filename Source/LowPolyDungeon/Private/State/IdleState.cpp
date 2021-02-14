@@ -23,7 +23,7 @@ void UIdleState::HandleInput_Implementation(EInputEvent Input, FKey key, float a
 	case IE_Pressed:
 		if (key == EKeys::R)
 		{
-			FSMRef->PushState(ECharacterState::ECS_EquipChange);
+			FSMRef->ChangeState(ECharacterState::ECS_EquipChange);
 		}
 		if (key == EKeys::E)
 		{
@@ -31,15 +31,15 @@ void UIdleState::HandleInput_Implementation(EInputEvent Input, FKey key, float a
 		}
 		if (key == EKeys::RightMouseButton)
 		{
-			FSMRef->PushState(ECharacterState::ECS_Block);
+			FSMRef->ChangeState(ECharacterState::ECS_Block);
 		}
 		if (key == EKeys::LeftMouseButton)
 		{
-			FSMRef->PushState(ECharacterState::ECS_Attack1);
+			FSMRef->ChangeState(ECharacterState::ECS_Attack1);
 		}
 		if (key == EKeys::SpaceBar)
 		{
-			FSMRef->PushState(ECharacterState::ECS_Dodge);
+			FSMRef->ChangeState(ECharacterState::ECS_Dodge);
 		}
 		break;
 	case IE_Released:
@@ -78,7 +78,7 @@ void UIdleState::Update_Implementation(float DeltaTime)
 	{
 		if (OwnedPlayer->GetVelocity().SizeSquared() > 0.5f )
 		{
-			FSMRef->PushState(ECharacterState::ECS_Walk);
+			FSMRef->ChangeState(ECharacterState::ECS_Walk);
 		}
 	}
 }

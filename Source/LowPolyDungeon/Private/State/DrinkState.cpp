@@ -25,7 +25,7 @@ void UDrinkState::HandleInput_Implementation(EInputEvent Input, FKey key, float 
 	case IE_Pressed:
 		if (key == EKeys::SpaceBar)
 		{
-			FSMRef->PushState(ECharacterState::ECS_Dodge);
+			FSMRef->ChangeState(ECharacterState::ECS_Dodge);
 		}
 		break;
 	case IE_Released:
@@ -45,7 +45,7 @@ void UDrinkState::HandleInput_Implementation(EInputEvent Input, FKey key, float 
 
 void UDrinkState::Enter_Implementation(float animationplayRate)
 {
-//	Super::Enter_Implementation(animationplayRate);
+	Super::Enter_Implementation(animationplayRate);
 //	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("Drink Enter!!"));
 }
 
@@ -53,7 +53,7 @@ void UDrinkState::Update_Implementation(float DeltaTime)
 {
 	Super::Update_Implementation(DeltaTime);
 
-	OwnedPlayer->StatComponent->RegenerateHealth(20.0f * DeltaTime);
+	OwnedPlayer->StatComponent->RegenerateHealth(35.0f * DeltaTime);
 }
 
 void UDrinkState::Exit_Implementation()

@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "Interactive.generated.h"
 
+/* 인터렉트 타입 */
 UENUM(BlueprintType)
 enum class EInteractiveType : uint8
 {
@@ -24,6 +25,7 @@ class UInteractive : public UInterface
 /**
  * 
  */
+ /* 캐릭터가 E key로 상호작용이 가능한 오브젝트일 경우 구현해서 사용하세요. */
 class LOWPOLYDUNGEON_API IInteractive
 {
 	GENERATED_BODY()
@@ -31,7 +33,7 @@ class LOWPOLYDUNGEON_API IInteractive
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	IInteractive();
-
+	 /* 인터페이스 함수 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interactive")
 	bool OnStartInteractive(AActor* actor);
 	virtual bool OnStartInteractive_Implementation(AActor* actor);

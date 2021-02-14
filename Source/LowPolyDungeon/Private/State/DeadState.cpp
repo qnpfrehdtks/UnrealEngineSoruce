@@ -43,7 +43,7 @@ void UDeadState::Enter_Implementation(float animationplayRate)
 	Super::Enter_Implementation(animationplayRate);
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Turquoise, TEXT("Stun Enter!!"));
 
-	FSMRef->PopAllState();
+	//FSMRef->AllClearState();
 }
 
 void UDeadState::Update_Implementation(float DeltaTime)

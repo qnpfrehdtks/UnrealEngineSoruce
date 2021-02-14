@@ -64,7 +64,7 @@ void UEquipmentComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 void UEquipmentComponent::EquipDefaultItem(USkeletalMeshComponent* mesh)
 {
-
+	// 새로 시작시 장착할 아이템 목록입니다.
 	auto item = mapDefaultItem.Find(EItemEquipmentType::EIT_Bottom);
 	if(item != nullptr) CreateItemAndEquip(mesh, *item);
 
@@ -88,6 +88,11 @@ void UEquipmentComponent::EquipDefaultItem(USkeletalMeshComponent* mesh)
 
 void UEquipmentComponent::UseSelectedItem( int32 index)
 {
+	if (SelectedItem == nullptr)
+	{
+		SelectedItem = GetEquippedItem(EItemEquipmentType::EIT_Potion);
+	}
+
 	if (SelectedItem != nullptr)
 	{
 		SelectedItem->UseItem_Implementation(index);
@@ -114,6 +119,7 @@ void UEquipmentComponent::UseItem(EItemEquipmentType type,int32 index)
 
 EItemEquipmentType UEquipmentComponent::ConvertToEquipType(EItemType type)
 {
+	// 아이템 타입에따라 장착 부위 enum 리턴
 	switch (type)
 	{
 	case EItemType::EIT_Weapon:
@@ -146,6 +152,7 @@ void UEquipmentComponent::SwapEquippedItemType(USkeletalMeshComponent* mesh)
 	{
 		UGameplayStatics::PlaySound2D(this, pushWeaponSound);
 
+		/* IEquipable 인터페이스 활용 */
 		IEquipable::Execute_OnEquip_EquipType(equippedWeapon, mesh, BackSocket);
 		mapEquippedItem.Add(EItemEquipmentType::EIT_Back, equippedWeapon);
 		mapEquippedItem.Remove(EItemEquipmentType::EIT_RightHand);
@@ -155,27 +162,32 @@ void UEquipmentComponent::SwapEquippedItemType(USkeletalMeshComponent* mesh)
 	{
 		UGameplayStatics::PlaySound2D(this, pullWeaponSound);
 
+		/* IEquipable 인터페이스 활용 */
 		IEquipable::Execute_OnEquip(backWeapon, mesh);
 		mapEquippedItem.Add(EItemEquipmentType::EIT_RightHand, backWeapon);
 		mapEquippedItem.Remove(EItemEquipmentType::EIT_Back);
 	}
 }
 
+
 void UEquipmentComponent::CreateItemAndEquip( USkeletalMeshComponent* mesh, TSubclassOf<AItemBase> itemClass)
 {
 	FActorSpawnParameters prams;
 	prams.Owner = GetOwner();
 
+	// 아이템을 스폰하고
 	AItemBase* newItem = GetWorld()->SpawnActor<AItemBase>(itemClass, FVector::ZeroVector, FRotator::ZeroRotator, prams);
 	
 	if (character != nullptr && newItem )
 	{
 		if (character->IsPlayerControlled())
 		{
+			// 인벤토리에 집어넣고
 			character->InsertToInventory(newItem);
 		}
 	}
 
+	//장착한다.
 	Equip(mesh, newItem, false);
 }
 
@@ -229,8 +241,10 @@ void UEquipmentComponent::Unequip(USkeletalMeshComponent* mesh, EItemEquipmentTy
 		}
 	}
 
+	/* 장착된 아이템에서 아이템 정보를 가져오고 */
 	AItemBase* oldItem = GetEquippedItem(type);
 
+	/* 삭제한다. */
 	if (oldItem != nullptr)
 	{
 		OnUnequipDelegate.Broadcast(oldItem);

@@ -22,7 +22,7 @@ void UWalkState::HandleInput_Implementation(EInputEvent Input, FKey key, float a
 	case IE_Pressed:
 		if (key == EKeys::R)
 		{
-			FSMRef->PushState(ECharacterState::ECS_EquipChange);
+			FSMRef->ChangeState(ECharacterState::ECS_EquipChange);
 			//FSMRef->PushState(ECharacterState::ECS_Drink);
 		}
 		if (key == EKeys::E)
@@ -31,15 +31,15 @@ void UWalkState::HandleInput_Implementation(EInputEvent Input, FKey key, float a
 		}
 		if (key == EKeys::RightMouseButton)
 		{
-			FSMRef->PushState(ECharacterState::ECS_Block);
+			FSMRef->ChangeState(ECharacterState::ECS_Block);
 		}
 		if (key == EKeys::LeftMouseButton)
 		{
-			FSMRef->PushState(ECharacterState::ECS_Attack1);
+			FSMRef->ChangeState(ECharacterState::ECS_Attack1);
 		}
 		if (key == EKeys::SpaceBar)
 		{
-			FSMRef->PushState(ECharacterState::ECS_Dodge);
+			FSMRef->ChangeState(ECharacterState::ECS_Dodge);
 			elapsedTime = 0.0f;
 		}
 		break;
@@ -49,7 +49,7 @@ void UWalkState::HandleInput_Implementation(EInputEvent Input, FKey key, float a
 		if (key == EKeys::Q && elapsedTime > 1.0f)
 		{
 			elapsedTime = 0.0f;
-			FSMRef->PushState(ECharacterState::ECS_Sprint);
+			FSMRef->ChangeState(ECharacterState::ECS_Sprint);
 		}
 		break;
 	case IE_DoubleClick:
@@ -86,7 +86,7 @@ void UWalkState::Update_Implementation(float DeltaTime)
 	{
 		if (OwnedPlayer->GetVelocity().SizeSquared() <= 0.01f)
 		{
-			FSMRef->PopState();
+			FSMRef->ChangeState(ECharacterState::ECS_Idle);
 		}
 	}
 }

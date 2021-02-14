@@ -37,6 +37,7 @@ void UInventoryComponent::BeginPlay()
 
 void UInventoryComponent::UpdateInventory()
 {
+	// 인벤토리의 정보를 업데이트해준다.
 	ALowpolyPlayerContorller* controller = Cast<ALowpolyPlayerContorller>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
 	if (controller != nullptr)
@@ -47,17 +48,20 @@ void UInventoryComponent::UpdateInventory()
 
 void UInventoryComponent::InsertInventory(class AItemBase* item)
 {
+	// 중복되는 아이템 Id는 리턴
 	if (mapItemInventory.Find(item->GetItemUniqueID()))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Duplicated Item ID "));
 		return;
 	}
 
+	// 인벤토리가 가득 찻는가?
 	if (IsFullInventory())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Inventory is full!!"));
 		return;
 	}
+
 	ALowpolyPlayerContorller* controller = Cast<ALowpolyPlayerContorller>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
 	if (controller != nullptr)
@@ -70,6 +74,7 @@ void UInventoryComponent::InsertInventory(class AItemBase* item)
 
 void UInventoryComponent::RemoveInventory(class AItemBase* item)
 {
+	// 인벤토리에서 해당 아이템을 제거한다.
 	if (mapItemInventory.Find(item->GetItemUniqueID()))
 	{
 		ALowpolyPlayerContorller* controller = Cast<ALowpolyPlayerContorller>(UGameplayStatics::GetPlayerController(GetWorld(), 0));

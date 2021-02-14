@@ -34,12 +34,15 @@ public:
 	class UBlackboardComponent* BBComponent;
 
 	// Perception component. 
+	/* AI가 소리,시야 탐지등에 쓰이는 컴포넌트*/
 	UPROPERTY(VisibleAnywhere, Category = "AI")
 	class UAIPerceptionComponent* AIPerception;
 
+	/* AISensse 주변에 사운드가 탐지되면 반응한다. */
 	UPROPERTY(EditDefaultsOnly, Category = "Blackboard")
 	TSubclassOf<class UAISense> HearingSense;
 
+	/* AISense 시야각에 적이 들어오면 탐지한다. */
 	UPROPERTY(EditDefaultsOnly, Category = "Blackboard")
 	TSubclassOf<class UAISense> SightSense;
 

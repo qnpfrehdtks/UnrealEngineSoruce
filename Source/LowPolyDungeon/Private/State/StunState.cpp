@@ -48,7 +48,7 @@ void UStunState::Enter_Implementation(float animationplayRate)
 	Super::Enter_Implementation(animationplayRate);
 //	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Stun Enter!!"));
 
-	FSMRef->PopAllState();
+	//FSMRef->PopAllState();
 }
 
 void UStunState::Update_Implementation(float DeltaTime)

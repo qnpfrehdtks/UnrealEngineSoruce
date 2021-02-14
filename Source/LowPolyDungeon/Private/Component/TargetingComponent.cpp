@@ -39,6 +39,7 @@ void UTargetingComponent::BeginPlay()
 
 void UTargetingComponent::FindLockOnTarget(FVector start, FRotator dir)
 {
+	/* 처음 타겟팅 진행시 실행되는 함수. */
 	ALowpolyCharacter* character = Cast<ALowpolyCharacter>(GetOwner());
 
 	if (character == nullptr) return;
@@ -57,7 +58,6 @@ void UTargetingComponent::FindLockOnTarget(FVector start, FRotator dir)
 		{
 			if (hitResult == nullptr) continue;
 			if (hitResult == character)continue;
-		//	DrawDebugLine(GetWorld(), start, endPos, FColor::Green, true, 2.0f);
 
 			FVector2D screenPos;
 
@@ -86,6 +86,7 @@ void UTargetingComponent::ChangeLockOnTarget(FVector start, FRotator dir)
 
 	TArray<AActor*> OverlappingActors;
 
+	/* SphereOverlapActors 액터로 주변에 있는 액터를 검사한다. */
 	bool isHit = UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetOwner()->GetActorLocation(),
 		TargetingRange, arrayTargetObjectType, nullptr, ActorsToIgnore, OverlappingActors);
 
@@ -94,8 +95,10 @@ void UTargetingComponent::ChangeLockOnTarget(FVector start, FRotator dir)
 
 	AActor* resultTarget = nullptr;
 
+	/* 주변에 액터가 존재한다. */
 	if (isHit)
 	{
+		/* 나의 카메라 가져온다. */
 		APlayerCameraManager* camera = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
 		FVector start = camera->GetCameraLocation();
 		FVector forward = camera->GetActorForwardVector() * TargetingRange;
@@ -105,17 +108,16 @@ void UTargetingComponent::ChangeLockOnTarget(FVector start, FRotator dir)
 			if (hitResult == nullptr) continue;
 			if (hitResult == character)continue;
 			
-			//DrawDebugLine(GetWorld(), start, endPos, FColor::Green, true, 2.0f);
-
-
 			FVector2D screenPos;
 
+			/* 만약 스크린에 적 액터가 모습을 비치는지 체크 */
 			if (UGameplayStatics::ProjectWorldToScreen(UGameplayStatics::GetPlayerController(GetWorld(), 0), hitResult->GetActorLocation(), screenPos))
 			{
 				FVector toTargetDir = (hitResult->GetActorLocation() - start).GetSafeNormal();
 
 				float dot = FVector::DotProduct(forward, toTargetDir);
 
+				/* 카메라 방향벡터와 적에 대한 방향 벡터 내적을 통해 가장 큰 값을 타겟팅으로 삼는다. */
 				if (MaxDot < dot)
 				{
 					MaxDot = dot;
@@ -124,6 +126,7 @@ void UTargetingComponent::ChangeLockOnTarget(FVector start, FRotator dir)
 			}
 		}
 
+		/* 언락하고 다시 타켓팅 */
 		if (resultTarget != nullptr)
 		{
 			UnLockTarget();
@@ -157,12 +160,15 @@ void UTargetingComponent::UnLockTarget()
 
 bool UTargetingComponent::LockTarget(AActor* target)
 {
+	/* 타겟팅 되는 액터는 ITargetable를 상속받은 구현 클래스이여야 한다.*/
 	ITargetable* newTarget = Cast<ITargetable>(target);
 	if (newTarget != nullptr)
 	{
 		OnTargetingDelegate.Broadcast();
 
 		TargetObject = target;
+
+		/* LockOn 진행시 실행되는 인터페이스 함수.*/
 		newTarget->Execute_OnStartTargeting(TargetObject, GetOwner());
 
 		return true;
@@ -187,6 +193,7 @@ void UTargetingComponent::RemoveTargetingMeObject(AActor* target)
 
 void UTargetingComponent::UnLockTargetByMyself()
 {
+	/* 만약 타겟팅 되었다면 타겟팅을 스스로 풉니다. */
 	if (arrTargeting.Num() == 0) return;
 
 	for (int i = 0 ; i < arrTargeting.Num(); i++)
@@ -204,6 +211,7 @@ void UTargetingComponent::UnLockTargetByMyself()
 
 void UTargetingComponent::OnTargetUpdateRotation(float DeltaTime)
 {
+	/* 타겟팅을 진행하면 실행되는 로테이션 함수. */
 	if (TargetObject == nullptr) return;
 
 	ALowpolyCharacter* character = Cast<ALowpolyCharacter>(TargetObject);
@@ -216,14 +224,17 @@ void UTargetingComponent::OnTargetUpdateRotation(float DeltaTime)
 	FVector targetPos = TargetObject->GetActorLocation();
 	targetPos.Z = startPos.Z;
 
+	/* 보간을 통해 진행. */
 	FRotator rot = UKismetMathLibrary::FindLookAtRotation(startPos, targetPos);
 	FRotator targetRot = UKismetMathLibrary::RInterpTo(GetOwner()->GetActorRotation(), rot, DeltaTime, 28.0f);
 
 	GetOwner()->SetActorRotation(targetRot.Quaternion());
 }
 
+
 void UTargetingComponent::OnTargetUpdateCamera(float DeltaTime)
 {
+	/* 카메라 또한 타겟팅을 향하도록 로테이션을 돌려주어야 한다. */
 	if (TargetObject == nullptr) return;
 
 	FVector targetPos = TargetObject->GetActorLocation(); //- TargetObject->GetActorRightVector() * 300.0f;

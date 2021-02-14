@@ -22,7 +22,7 @@ void UBlockState::HandleInput_Implementation(EInputEvent Input, FKey key, float 
 	case IE_Released:
 		if (key == EKeys::RightMouseButton )
 		{
-			FSMRef->PopState();
+			FSMRef->ChangeState(ECharacterState::ECS_Idle);
 		}
 		break;
 	case IE_Repeat:
@@ -96,7 +96,7 @@ float UBlockState::Damaged(EAttackType dmgType, FVector dmgPosition, float DMG)
 
 	
 
-	if (FSMRef->PushState_float(ECharacterState::ECS_Blocking, resultConsumeStamina) == false)
+	if (FSMRef->ChangeState_float(ECharacterState::ECS_Blocking, resultConsumeStamina) == false)
 	{
 		OwnedPlayer->consumeStamina(resultConsumeStamina);
 		float resultDmg = DMG - currentStamina;

@@ -24,7 +24,7 @@ void UCombatState::HandleInput_Implementation(EInputEvent Input, FKey key, float
 	case IE_Pressed:
 		if (key == EKeys::LeftMouseButton )
 		{
-			FSMRef->ReleaseAndPushState(ECharacterState::ECS_Attack2);
+			FSMRef->ReserveState(ECharacterState::ECS_Attack2);
 			FSMRef->bCanInput = false;
 		}
 		break;

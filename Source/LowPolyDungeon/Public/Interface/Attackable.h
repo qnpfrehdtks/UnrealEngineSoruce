@@ -7,6 +7,8 @@
 #include "Enums/CharacterEnums.h"
 #include "Attackable.generated.h"
 
+
+/* 언리얼 인터페이스 */
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UAttackable : public UInterface
@@ -17,6 +19,8 @@ class UAttackable : public UInterface
 /**
  * 
  */
+
+/* 공격 데미지를 입을 수 있는 오브젝트는 이 인터페이스를 구현해서 사용하세요. */
 class LOWPOLYDUNGEON_API IAttackable
 {
 	GENERATED_BODY()

@@ -33,6 +33,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	class ALowpolyCharacter* ownedCharacter;
 
+	/* */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	class UCapsuleComponent* BoxComponent;
 
@@ -42,16 +43,20 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mesh")
 	class UStaticMeshComponent* StaticItemMesh;
 
+	/* 아이템 데이터를 가져와 초기화 진행한다. */
 	UFUNCTION()
 	void InitializeItemDate();
 
+	/* 아이템 사용 */
 	UFUNCTION(BlueprintNativeEvent)
 	void UseItem(int32 index);
 	virtual void UseItem_Implementation(int32 index);
 
+	/* Bone 소켓네임을 찾아 부탁한다. */
 	UFUNCTION(BlueprintCallable)
 	void AttachToMesh_ByName(class USkeletalMeshComponent* mesh, FName SocketName);
 
+	/* 그냥 메시에 부착한다. */
 	UFUNCTION(BlueprintCallable)
 	void AttachToMesh(class USkeletalMeshComponent* mesh);
 
@@ -98,21 +103,25 @@ public:
 	FORCEINLINE TMap<FString, float>& GetItemMap() { return itemData.mapAttribute; }
 
 protected:
+	/* 아이템 데이터 정보 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
 	FInventoryItemData itemData;
 
+	/* 아이템 ID */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
 	int32 ItemID;
 
+	/* 아이템 UID */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
 	int32 uniqueItemID;
 
+	/* 장착되었나? */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
 	bool isEquipped;
 
 	
 
-	// ----- interface --------
+	// ----- interface 구현 --------
 	virtual void OnEquip_Implementation(class USkeletalMeshComponent* mesh) override;
 	virtual void OnEquip_EquipType_Implementation(class USkeletalMeshComponent* mesh, FName SocketName) override;
 	virtual void OnDetach_Implementation() override;

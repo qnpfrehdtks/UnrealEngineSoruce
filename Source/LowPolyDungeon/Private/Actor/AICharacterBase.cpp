@@ -59,7 +59,7 @@ void AAICharacterBase::BeginPlay()
 	Super::BeginPlay();
 
 	/* 특정 체력이 되면 Phase 변화시킴.*/
-	//StatComponent->OnHPDamageDelegate.AddUObject(this, &AAICharacterBase::ChangePhase);
+	StatComponent->OnHPDamageDelegate.AddUObject(this, &AAICharacterBase::ChangePhase);
 
 	TargetingComponent->OnTargetingDelegate.AddLambda
 	(
@@ -69,8 +69,7 @@ void AAICharacterBase::BeginPlay()
 		}
 	);
 
-
-
+	UE_LOG(LogTemp, Warning, TEXT("MySpawn Restun!! %d"), FSM->GetState());
 }
 
 void AAICharacterBase::Dead()
@@ -87,6 +86,8 @@ void AAICharacterBase::Dead()
 	}
 }
 
+
+/* 랜덤으로 택한 공격중 하나 택함 */
 void AAICharacterBase::Attack()
 {
 	if (FSM == nullptr) return;
@@ -104,19 +105,19 @@ void AAICharacterBase::Attack()
 	switch (attackIDX)
 	{
 	case 0:
-		FSM->PushState(ECharacterState::ECS_Attack1);
+		FSM->ChangeState(ECharacterState::ECS_Attack1);
 		break;
 	case 1:
-		FSM->PushState(ECharacterState::ECS_Attack2);
+		FSM->ChangeState(ECharacterState::ECS_Attack2);
 		break;
 	case 2:
-		FSM->PushState(ECharacterState::ECS_Attack3);
+		FSM->ChangeState(ECharacterState::ECS_Attack3);
 		break;
 	case 3:
-		FSM->PushState(ECharacterState::ECS_Attack4);
+		FSM->ChangeState(ECharacterState::ECS_Attack4);
 		break;
 	case 4:
-		FSM->PushState(ECharacterState::ECS_Attack5);
+		FSM->ChangeState(ECharacterState::ECS_Attack5);
 		break;
 	default:
 		break;
@@ -132,8 +133,7 @@ void AAICharacterBase::PlayForceState(ECharacterState state)
 
 	if (currentState != ECharacterState::ECS_Idle && currentState != ECharacterState::ECS_Walk) return;
 
-	FSM->PopAllState();
-	FSM->PushState(state);
+	FSM->ChangeState(state);
 }
 
 /* AI는 AI Behavior에서 실행. */
@@ -143,10 +143,14 @@ void AAICharacterBase::SelectState(ECharacterState state)
 	if (!FSM->bCanInput) return;
 
 	ECharacterState currentState = FSM->GetState();
+//	UE_LOG(LogTemp, Warning, TEXT("Fucing !!!%s  Attack!!2222222222"), *GetName());
+	if (currentState != ECharacterState::ECS_Idle && currentState != ECharacterState::ECS_Walk && currentState != ECharacterState::ECS_None)
+	{
+		
+		return;
+	}
 
-	if (currentState != ECharacterState::ECS_Idle && currentState != ECharacterState::ECS_Walk) return;
-
-	FSM->PushState(state);
+	FSM->ChangeState(state);
 }
 
 void AAICharacterBase::ChangePhase(float healthRatio)
@@ -155,8 +159,7 @@ void AAICharacterBase::ChangePhase(float healthRatio)
 	{
 		if (healthRatio <= 0.4f)
 		{
-			FSM->PopAllState();
-			FSM->PushState(ECharacterState::ECS_Drink);
+			FSM->ChangeState(ECharacterState::ECS_Drink);
 
 			currentPhase = ECharacterPhase::ECP_PHASE_02;
 			GetMesh()->SetScalarParameterValueOnMaterials(TEXT("IsRim"), 1.0f);

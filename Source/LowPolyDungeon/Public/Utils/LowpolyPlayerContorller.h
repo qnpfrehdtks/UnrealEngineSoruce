@@ -17,27 +17,33 @@ class LOWPOLYDUNGEON_API ALowpolyPlayerContorller : public APlayerController
 public:
 	ALowpolyPlayerContorller();
 
+	/* 인벤토리 Widget Class*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category ="Inventory")
 	TSubclassOf<class UInventoryUserWidget> IneventoryWidgetClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
 	UInventoryUserWidget* InventoryWidget;
 
+
+	/* 사망시 메세지 Widget Class*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TSubclassOf<class UUserWidget> DyingWidgetClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
 	class UUserWidget* DyingWidget;
 
+	/* 승리시 메세지 Widget Class*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TSubclassOf<class UUserWidget> VictoryWidgetClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
 	class UUserWidget* VictoryWidget;
 
+	/* 사망시 사운드 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
 	class USoundCue* DyingSoundCue;
 
+	/* 승리시 사운드 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
 	USoundCue* VictorySoundCue;
 

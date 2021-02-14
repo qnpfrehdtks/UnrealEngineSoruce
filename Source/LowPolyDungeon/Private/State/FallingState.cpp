@@ -49,7 +49,7 @@ void UFallingState::Enter_Implementation(float animationplayRate)
 	Super::Enter_Implementation(animationplayRate);
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, TEXT("Falling Enter!!"));
 
-	FSMRef->PopAllState();
+	//FSMRef->PopAllState();
 }
 
 void UFallingState::Update_Implementation(float DeltaTime)
@@ -60,7 +60,7 @@ void UFallingState::Update_Implementation(float DeltaTime)
 	{
 		if (OwnedPlayer->GetVelocity().Z <= 0.01f)
 		{
-			FSMRef->PlayTopState();
+			FSMRef->ChangeState(ECharacterState::ECS_Idle);
 		}
 	}
 }

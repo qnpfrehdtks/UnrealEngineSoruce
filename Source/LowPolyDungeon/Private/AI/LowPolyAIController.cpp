@@ -75,6 +75,7 @@ ETeamAttitude::Type ALowPolyAIController::GetTeamAttitudeTowards(const AActor& O
 			FGenericTeamId OtherTeamID = TeamAgent->GetGenericTeamId();
 			if (OtherTeamID == 10) 
 			{
+				/* 팀아이디가 10이면 중립*/
 				return ETeamAttitude::Neutral;
 			}
 			else 

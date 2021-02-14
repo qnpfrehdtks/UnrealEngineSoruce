@@ -52,33 +52,44 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Targeting")
 	class UTargetingComponent* TargetingComponent;
 
+
+	// 캐릭터의 스,
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "State")
 	class UStatComponent* StatComponent;
 
+	// 장비의 정보를 담은 컴포넌트입니다.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "State")
 	class UEquipmentComponent* EquipComponent;
 
+	// 플레이어와 오브젝트가 상호작용할 시 처리하는 루틴을 담은 컴포넌트
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Targeting")
 	class UInteractComponent* InteractComponent;
 
+	// 인벤토리 컴포넌트
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory")
 	class UInventoryComponent* InventoryComponent;
 
+	//피격시 재생되는 히트 이펙트
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Particle")
 	class UParticleSystem* HitEffect;
 
+	// 피격시 발생하는 사운드
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Sound")
 	class USoundCue* HitSoundCue;
 
+	// 캐릭터의 HPBar 위젯
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	class UWidgetComponent* HPBarWidget;
 
+	// 타겟팅 할 시 띄울 위젯
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	class UWidgetComponent* TargetingWidget;
 
+	// 사망시 띄우는 메세지 위젯
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	class UWidgetComponent* DyingMessageWidget;
 
+	// 승리시 띄우는 메세지 위젯
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	class UWidgetComponent* VictoryMessageWidget;
 
@@ -149,15 +160,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OffBlock();
 
+	// E키 입력시 아이템 사용
 	UFUNCTION()
 	void UseItem();
 
+	// 아이템과 상호작용시 실행 함수
 	UFUNCTION()
 	void InteractObject();
 
+	//장착된 아이템 변경시 실행.
 	UFUNCTION()
 	void ChangeEquippedItem();
 
+	// 앞으로 이동시 실행 함수.
 	UFUNCTION()
 	void MoveForward(float value);
 	UFUNCTION()

@@ -108,7 +108,7 @@ void AItemBase::UseItem_Implementation(int32 index)
 	}
 
 	ALowpolyCharacter* character  = Cast<ALowpolyCharacter>(GetOwner());
-	character->FSM->PushState(ECharacterState::ECS_Drink);
+	character->FSM->ChangeState(ECharacterState::ECS_Drink);
 
 	return;
 

@@ -35,10 +35,12 @@ bool ASoulItem::OnStartInteractive_Implementation(AActor* actor)
 	FActorSpawnParameters prams;
 	prams.Owner = GetOwner();
 
+	/* 인터렉트 시작시 자신에게 등록된 아이템 정보를 스폰하고, 캐릭터의 인벤토리에 전달한다. */
 	AItemBase* newItem = GetWorld()->SpawnActor<AItemBase>(soulItemClass, FVector::ZeroVector, FRotator::ZeroRotator, prams);
 
 	if (character != nullptr && soulItemClass != nullptr)
 	{
+		/* 아이템 생성 루틴 */
 		character->InsertToInventory(newItem);
 		newItem->InitializeItemDate();
 		OnStartInteractiveEvent(newItem);
@@ -48,6 +50,7 @@ bool ASoulItem::OnStartInteractive_Implementation(AActor* actor)
 		UE_LOG(LogTemp, Warning, TEXT("Interacr Fail!!!"));
 	}
 
+	/* 파티클 종료 ㅡ 비활성화 */
 	Mesh->SetVisibility(false);
 	ParticleComponent->Deactivate();
 

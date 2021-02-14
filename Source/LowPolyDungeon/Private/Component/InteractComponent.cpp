@@ -19,9 +19,7 @@ UInteractComponent::UInteractComponent()
 void UInteractComponent::BeginPlay()
 {
 	Super::BeginPlay();
-//	interactHitCollsion->OnComponentBeginOverlap.AddDynamic(this, &UInteractComponent::OnHitCollisionToItem);
-	// ...
-	
+
 }
 
 
@@ -30,7 +28,6 @@ void UInteractComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
 }
 
 void UInteractComponent::FindClosestInteractObject(TArray<AActor*>& arr)
@@ -38,6 +35,8 @@ void UInteractComponent::FindClosestInteractObject(TArray<AActor*>& arr)
 	float prevMaxDist = 99999.0f;
 	AInteractiveActorBase* resultActor = nullptr;
 
+	// 가장 가까운 아이템을 가져오는 함수입니다.
+	// 가까운 액터들의 배열을 순차적으로 돌면서 가장 가까운 액터를 가져옵니다.
 	for (auto& actor : arr)
 	{
 		AInteractiveActorBase* interactItem = Cast<AInteractiveActorBase>(actor);
@@ -55,8 +54,6 @@ void UInteractComponent::FindClosestInteractObject(TArray<AActor*>& arr)
 	if (resultActor != nullptr)
 	{
 		closestInteractObject = resultActor;
-	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("Select!!"));
-		//IInteractive::Execute_OnStartInteractive(InteractObject, GetOwner());
 	}
 	else
 	{
@@ -76,31 +73,4 @@ bool UInteractComponent::InteractToObject()
 	return false;
 }
 
-//void UInteractComponent::OnHitCollisionToItem(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-//{
-//	IInteractive* interactItem = Cast<IInteractive>(OtherActor);
-//	UE_LOG(LogTemp, Warning, TEXT("Interact : %s"), *OtherActor->GetName());
-//	if (interactItem != nullptr)
-//	{
-//		float MaxDist = 99999.0f;
-//		TArray<AActor*> arrOverlapping;
-//		
-//		//interactHitCollsion->GetOverlappingActors(arrOverlapping);
-//
-//		for (auto& actor : arrOverlapping)
-//		{
-//			float dist = (actor->GetActorLocation() - GetOwner()->GetActorLocation()).Size();
-//
-//		//	if (dist < MaxDist)
-//		//	{
-//				MaxDist = dist;
-//				UE_LOG(LogTemp, Warning,  TEXT("Interact : %s"), *actor->GetName());
-//				InteractObject = Cast<AInteractiveActorBase>(actor);
-//
-//				IInteractive::Execute_OnStartInteractive(InteractObject, GetOwner());
-//		//	}
-//		}
-//	}
-//
-//}
 

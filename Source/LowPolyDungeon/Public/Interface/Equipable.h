@@ -17,6 +17,7 @@ class UEquipable : public UInterface
 /**
  * 
  */
+ /* 장착이 가능한 오브젝트는 이 인터페이스를 구현해서 사용하세요. 아이템 같은거 */
 class LOWPOLYDUNGEON_API IEquipable
 {
 	GENERATED_BODY()

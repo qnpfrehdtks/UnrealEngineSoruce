@@ -113,8 +113,6 @@ void ALowpolyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//FSM->AddState(0, UIdleState::Static());
-	//FSM->AddState(1, UCombatState::GetClass());
 	EquipComponent->EquipDefaultItem(GetMesh());
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
@@ -159,8 +157,8 @@ void ALowpolyCharacter::BeginPlay()
 	StatComponent->OnStaminaZeroDelegate.AddLambda(
 		[this]()
 		{
-			if(FSM->currentState->EState == ECharacterState::ECS_Sprint)
-				FSM->PopState();
+			if (FSM->currentState->EState == ECharacterState::ECS_Sprint)
+				FSM->ChangeState(ECharacterState::ECS_Walk);
 			//if (FSM->currentState->EState == ECharacterState::ECS_Block)
 			//	FSM->PopState();
 		}
@@ -192,6 +190,7 @@ void ALowpolyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// 캐릭터의 스태미너와 체력 리젠과 관련된 코드
 	if (FSM != nullptr)
 	{
 		if (FSM->currentState != nullptr && FSM->currentState->plusStaminaPerSecond > 0.01f)
@@ -204,6 +203,7 @@ void ALowpolyCharacter::Tick(float DeltaTime)
 		}
 	}
 
+	// 만약 캐릭터가 사망시 처리하게 되는 루틴
 	if (bIsDestroying)
 	{
 		auto arr = GetMesh()->GetAttachChildren();
@@ -214,6 +214,7 @@ void ALowpolyCharacter::Tick(float DeltaTime)
 
 			if (ChildSkeleton)
 			{
+				// 메테리얼을 가져와서 디졸브 쉐이더 실행.
 				ChildSkeleton->SetScalarParameterValueOnMaterials(TEXT("DissolveAmount"), DissolveAmount );
 			}
 		}
@@ -221,6 +222,7 @@ void ALowpolyCharacter::Tick(float DeltaTime)
 		DissolveAmount += DeltaTime * 0.1f;
 	}
 
+	// 타겟팅 카메라와 관련된 코드
 	if (FSM->currentState != nullptr)
 	{
 		if (FSM->currentState->bIsTargetCamera)
@@ -238,6 +240,8 @@ void ALowpolyCharacter::Tick(float DeltaTime)
 void ALowpolyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	//  키 입력과 관련된 코드입니다.
 
 	PlayerInputComponent->BindAction(TEXT("Attack"), IE_Pressed, this, &ALowpolyCharacter::Attack);
 
@@ -267,16 +271,19 @@ void ALowpolyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void ALowpolyCharacter::UseItem()
 {
+	// E키 입력시 아이템 사용
 	FSM->HandleInput(EInputEvent::IE_Pressed, EKeys::E);
 }
 
 void ALowpolyCharacter::InteractObject()
 {
+	// 아이템과 인터렉션 하기 위한 함수
 	InteractComponent->InteractToObject();
 }
 
 void ALowpolyCharacter::ChangeEquippedItem()
 {
+	// 현재 들고 있는 아이템 스위치하기 위한 함수.
 	if (EquipComponent->GetEquippedItem(EItemEquipmentType::EIT_RightHand) ||
 		EquipComponent->GetEquippedItem(EItemEquipmentType::EIT_Back))
 		FSM->HandleInput(EInputEvent::IE_Pressed, EKeys::R);
@@ -284,30 +291,36 @@ void ALowpolyCharacter::ChangeEquippedItem()
 
 void ALowpolyCharacter::UseSelectedItem(int32 index)
 {
+	// 선택된 아이템 사용 (보통 인벤토리내에 슬롯을 사용시)
 	EquipComponent->UseSelectedItem(index);
 }
 
 float ALowpolyCharacter::GetStamina()
 {
+	//스태미너를 가져옵니다.
 	return StatComponent->CurrentStamina;
 }
 
 void ALowpolyCharacter::consumeStamina(float stamina)
 {
+	// 스태미너를 소비합니다.
 	StatComponent->DamageStamina(stamina);
 }
 
 void ALowpolyCharacter::consumeHealth(float hp)
 {
+	// HP를 소비합니다.
 	StatComponent->DamageHealth(hp);
 }
 
 void ALowpolyCharacter::UseEquippedItem(EItemEquipmentType equipType, int32 index)
 {
+	// 장착된 아이템을 사용합니다.
 	EquipComponent->UseItem(equipType, index);
 }
 
 
+// 타겟할 대상을 선택할 시 실행되는 함수입니다.
 void ALowpolyCharacter::OnSelectTarget()
 {
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
@@ -315,6 +328,7 @@ void ALowpolyCharacter::OnSelectTarget()
 
 }
 
+//죽음 발생시 실행되는 함수입니다.
 void ALowpolyCharacter::Dead()
 {
 	/* Dead timer 발생. */
@@ -323,17 +337,21 @@ void ALowpolyCharacter::Dead()
 
 	GetWorld()->GetTimerManager().SetTimer(DeadTimer,this, &ALowpolyCharacter::PostDeadTimer, DeadTime, false);
 
+	// 타겟팅 상대를 제거.
 	TargetingComponent->UnLockTarget();
 	TargetingComponent->UnLockTargetByMyself();
 
+	// 스테이트는 죽음으로
 	FSM->ChangeState(ECharacterState::ECS_Dead);
 
+	// 보스가 아니하면 시체를 래그돌로 처리합니다.
 	if (CharacterType != ECharacterType::ECT_Boss)
 	{
 		GetMesh()->SetSimulatePhysics(true);
 		GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
 	}
 
+	//나는 이제 삭제중.
 	bIsDestroying = true;
 
 	if(InventoryComponent)
@@ -345,6 +363,7 @@ void ALowpolyCharacter::Dead()
 
 	if (controller != nullptr)
 	{
+		// 죽었다하는 widget 메세지 띄워줍니다.
 		controller->VisibleDyingMessage(true);
 	}
 
@@ -352,11 +371,13 @@ void ALowpolyCharacter::Dead()
 
 	if (gameMode != nullptr)
 	{
+		// 현재 전투 UI를 안보이게 처리합니다.
 		gameMode->SetBattleModeUIVisible(false);
 	}
 
 }
 
+// 죽은 후, 3초뒤에 처리할 타이머의 콜백함수입니다.
 void ALowpolyCharacter::PostDeadTimer()
 {
 	AItemBase* weapon = EquipComponent->GetEquippedItem(EItemEquipmentType::EIT_RightHand);
@@ -373,12 +394,13 @@ void ALowpolyCharacter::PostDeadTimer()
 	if (TargetingWidget)
 		TargetingWidget->SetVisibility(false);
 
+//	FSM->AllClearState();
+
 	Destroy();
 }
 
 void ALowpolyCharacter::Attack()
 {
-	//FSM->HandleInput(EInputEvent::IE_Pressed, EKeys::LeftMouseButton);
 	UE_LOG(LogTemp, Warning, TEXT("Attack!!"));
 	
 	if (EquipComponent->GetEquippedItem(EItemEquipmentType::EIT_RightHand))
@@ -387,30 +409,35 @@ void ALowpolyCharacter::Attack()
 		ChangeEquippedItem();
 }
 
+// 회피시 실행되는 함수.
 void ALowpolyCharacter::Dodge()
 {
 	FSM->HandleInput(EInputEvent::IE_Pressed, EKeys::SpaceBar);
 }
 
+
+// 방어 처음 시작시 실행.
 void ALowpolyCharacter::OnBlock()
 {
 	if (EquipComponent->GetEquippedItem(EItemEquipmentType::EIT_RightHand))
 		FSM->HandleInput(EInputEvent::IE_Pressed, EKeys::RightMouseButton);
 }
 
+// 블록 반복시 실행.
 void ALowpolyCharacter::RepeatBlock()
 {
 	if (EquipComponent->GetEquippedItem(EItemEquipmentType::EIT_RightHand))
 	FSM->HandleInput(EInputEvent::IE_Repeat, EKeys::RightMouseButton);
 }
 
+// 방어 풀 시 실행되는 함수.
 void ALowpolyCharacter::OffBlock()
 {
 	if (EquipComponent->GetEquippedItem(EItemEquipmentType::EIT_RightHand))
 	FSM->HandleInput(EInputEvent::IE_Released, EKeys::RightMouseButton);
 }
 
-
+// 무브 포워드
 void ALowpolyCharacter::MoveForward(float value)
 {
 	if (FSM->currentState != nullptr && FSM->currentState->bCanMove)
@@ -431,17 +458,20 @@ void ALowpolyCharacter::MoveRight(float value)
 	}
 }
 
+// 마우스를 상하이동시 
 void ALowpolyCharacter::Turn(float value)
 {
 	if(TargetingComponent->TargetObject == nullptr)
 		AddControllerYawInput(value);
 }
 
+// 마우스 좌우 이동시
 void ALowpolyCharacter::LookAt(float value)
 {
 	AddControllerPitchInput(value);
 }
 
+// 상대를 타겟하는 키를 입력시
 void ALowpolyCharacter::TargetOn()
 {
 	FVector pos;
@@ -450,12 +480,13 @@ void ALowpolyCharacter::TargetOn()
 	TargetingComponent->ChangeLockOnTarget(pos, rot);
 }
 
-
+// 달리기 모드를 해제할 시
 void ALowpolyCharacter::OffSprint()
 {
 	FSM->HandleInput(EInputEvent::IE_Released, EKeys::Q);
 }
 
+// 인벤토리를 엽니다.
 void ALowpolyCharacter::activeInventory()
 {
 	if (bIsDestroying == true) return;
@@ -467,6 +498,7 @@ void ALowpolyCharacter::activeInventory()
 	}
 }
 
+//캐릭터의 상태 값을 가져옵니다.
 ECharacterState ALowpolyCharacter::GetState()
 {
 	if (FSM == nullptr)

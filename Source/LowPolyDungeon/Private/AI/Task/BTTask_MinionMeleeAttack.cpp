@@ -36,17 +36,18 @@ EBTNodeResult::Type UBTTask_MinionMeleeAttack::ExecuteTask(UBehaviorTreeComponen
 	
 	if (controllingPawn == nullptr) return EBTNodeResult::Failed;
 
-	if(AIBase == nullptr)
-		AIBase = Cast<AAICharacterBase>(controllingPawn);
+	AIBase = Cast<AAICharacterBase>(controllingPawn);
 
 	if(AIBase == nullptr)
 		return EBTNodeResult::Failed;
+
+	UE_LOG(LogTemp, Warning, TEXT("i'LL ATTACK : %s"), *(controllingPawn->GetName()));
 
 	if (isAttacking == false)
 	{
 		int32 idx = FMath::RandRange(0,arrayState.Num() - 1);
 		AIBase->SelectState(arrayState[idx]);
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UBTTask_MinionMeleeAttack::AttackTimer, 1.0f );
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UBTTask_MinionMeleeAttack::AttackTimer,0.9f );
 	}
 	isAttacking = true;
 	return EBTNodeResult::InProgress;

@@ -49,7 +49,6 @@ void UFSMComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 
 void UFSMComponent::Start()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Attack%d Init!!"), StateArray.Num()));
 	if (ownedCharacter == nullptr)
 	{
 		AActor* pawn = GetOwner();
@@ -62,12 +61,12 @@ void UFSMComponent::Start()
 	TArray<FStateData*> arrayData;
 	StateData->GetAllRows(FString(""), arrayData);
 
+	/* DataTable 에서 이 캐릭터가 행동할 State들을 가져온다. */
 	for (auto& data : arrayData)
 	{
 		if (data == nullptr) continue;
 		if (data->StateClass == nullptr)
 		{
-		//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Fail State "), StateArray.Num()));
 			continue;
 		}
 
@@ -84,11 +83,19 @@ void UFSMComponent::Start()
 		}
 	}
 
-	PushState(StartState);
-	//ChangeState(StartState);
+	StartState = ECharacterState::ECS_Idle;
+	bCanInput = true;
+
+	/* Idle 실행 */
+	ChangeState(StartState);
 }
 
+void UFSMComponent::ReserveState(ECharacterState eState)
+{
+	ResverdState = eState;
+}
 
+/* State 값 가져온다. */
 UStateBase* UFSMComponent::FindState(ECharacterState eState)
 {
 	if (StateMap.Num() == 0) return nullptr;
@@ -98,7 +105,7 @@ UStateBase* UFSMComponent::FindState(ECharacterState eState)
 	return stateBase == nullptr ? nullptr : *stateBase;
 }
 
-
+/* 캐릭터의 인풋에 따른 처리를 여기에서 진행함. */
 void UFSMComponent::HandleInput(EInputEvent Input, FKey key, float axisValue)
 {
 	if (bCanInput == false) return;
@@ -112,23 +119,6 @@ void UFSMComponent::HandleInput(EInputEvent Input, FKey key, float axisValue)
 }
 
 
-bool UFSMComponent::ReleaseAndPushState(ECharacterState eState)
-{
-	UStateBase* newState = FindState(eState);
-
-	if (newState == nullptr) return false;
-
-	if (CheckEnterDelegate.Execute(newState) == false)
-	{
-		return false;
-	}
-
-	ReservePopState();
-	ReservePushState(eState);
-
-	return true;
-	//bCanInput = false;
-}
 
 bool UFSMComponent::ChangeState(ECharacterState eState)
 {
@@ -155,7 +145,49 @@ bool UFSMComponent::ChangeState(ECharacterState eState)
 	}
 	else
 	{
-		//ChangeState(StartState);
+		ChangeState(StartState);
+		UE_LOG(LogTemp, Warning, TEXT("Not have a State Key "));
+	}
+
+	return false;
+}
+
+bool UFSMComponent::PlayReserveState()
+{
+	if (ResverdState == ECharacterState::ECS_None) return false;
+
+	bool result = ChangeState(ResverdState);
+	ResverdState = ECharacterState::ECS_None;
+	return result;
+
+}
+
+bool UFSMComponent::ChangeState_float(ECharacterState eState, float _consumeStamina)
+{
+
+	UStateBase* newState = FindState(eState);
+
+	if (newState != nullptr)
+	{
+		if (CheckEnterDelegate_float.Execute(_consumeStamina) == false)
+		{
+			return false;
+		}
+
+		if (currentState != nullptr)
+		{
+			currentState->Exit();
+		}
+
+		newState->Enter(animationSpeed);
+		currentState = newState;
+
+
+		return true;
+	}
+	else
+	{
+		ChangeState(StartState);
 		UE_LOG(LogTemp, Warning, TEXT("Not have a State Key "));
 	}
 
@@ -164,135 +196,6 @@ bool UFSMComponent::ChangeState(ECharacterState eState)
 
 }
 
-bool UFSMComponent::PushState(ECharacterState eState)
-{
-	UStateBase* newState = FindState(eState);
-
-	if (newState != nullptr)
-	{
-		if (CheckEnterDelegate.Execute(newState) == false)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Fail!!"));
-			return false;
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Good!!"));
-		}
-
-		StateStack.Push(newState);
-		topState = StateStack.Top();
-		PlayTopState();
-		                                                                                                                                                 
-		return true;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Not have a State Key"));
-	}
-
-	return false;
-}
-
-bool UFSMComponent::PushState_float(ECharacterState eState, float _consumeStamina)
-{
-	UStateBase* newState = FindState(eState);
-
-	if (newState != nullptr)
-	{
-		if (CheckEnterDelegate_float.Execute(_consumeStamina) == false)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Fail!!"));
-			return false;
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Good!!"));
-		}
-
-		StateStack.Push(newState);
-		topState = StateStack.Top();
-		PlayTopState();
-
-		return true;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Not have a State Key"));
-	}
-
-	return false;
-}
-
-void UFSMComponent::PlayTopState()
-{
-	if (currentState != nullptr)
-	{
-		currentState->Exit();
-	}
-	
-	auto state = StateStack.Top();
-
-	if (state != nullptr)
-	{
-		state->Enter(animationSpeed);
-		currentState = state;
-	}
-	else
-	{
-		ChangeState(StartState);
-		UE_LOG(LogTemp, Warning, TEXT("Not have a Top State Key"));
-	}
-}
-
-void UFSMComponent::ReservePushState(ECharacterState eState)
-{
-	UStateBase* newState = FindState(eState);
-
-	if (newState != nullptr)
-	{
-		StateStack.Push(newState);
-		topState = StateStack.Top();
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Not have a State Key"));
-	}
-}
-
-void UFSMComponent::ReservePopState()
-{
-	if (StateStack.Num() > 0 && currentState != nullptr)
-	{
-		StateStack.Pop();
-		topState = StateStack.Top();
-	}
-}
-
-void UFSMComponent::PopState()
-{
-	if (StateStack.Num() > 0 && currentState != nullptr)
-	{
-		StateStack.Pop();
-
-		if (StateStack.Num() > 0)
-			topState = StateStack.Top();
-		else
-			topState = nullptr;
-
-		PlayTopState();
-	}
-}
-
-void UFSMComponent::PopAllState()
-{
-	while (StateStack.Num() > 0)
-	{
-		StateStack.Pop();
-	}
-
-	ReservePushState(StartState);
-}
 
 ECharacterState UFSMComponent::GetState()
 {
@@ -307,6 +210,7 @@ float UFSMComponent::GetDamaged(EAttackType attackType ,FVector attackPosition, 
 		return 0.0f;
 	}
 
+	/* 데미지를 입는 이벤트 발생시 현재 스테이트에 전달한다. */
 	return currentState->Damaged(attackType, attackPosition, DMG);
 }
 

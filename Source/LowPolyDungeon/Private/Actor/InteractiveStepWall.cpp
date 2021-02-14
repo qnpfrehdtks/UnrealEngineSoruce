@@ -54,21 +54,22 @@ bool AInteractiveStepWall::OnStartInteractive_Implementation(AActor* actor)
 	FActorSpawnParameters prams;
 	prams.Owner = GetOwner();
 
-	
-
 	if (character != nullptr )
 	{
+		/* 인터렉트 시 델리게이트 실행 */
 		OnStartInteractiveEvent(nullptr);
 	}
 	
+	/* 메시 비활성화 */
 	StaticMesh->SetVisibility(false);
 	Mesh->SetVisibility(false);
 
-
+	/* 충돌 제거 */
 	StaticMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	SphereComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	SphereComponent->Deactivate();
 
+	/* 파티틀 재생. */
 	auto particle = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), InteractParticle, GetActorLocation(), FRotator::ZeroRotator, true);
 	UGameplayStatics::PlaySound2D(GetWorld(), InteractSound, 1.0f);
 

@@ -23,16 +23,17 @@ protected:
 public:
 	AAICharacterBase();
 
+	/* 현재 적의 페이즈 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Phase")
 	ECharacterPhase currentPhase;
 
+	/* 분노시 파티클 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Particle")
 	class UParticleSystem* rageParticle;
 
+	/* 캐릭터의 메테리얼 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Materials")
 	class UMaterialInstance* matInstance;
-
-
 	
 	void Dead() override;
 	void Attack() override;

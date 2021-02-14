@@ -28,12 +28,14 @@ public:
 
 
 public:
+	/* 아이템 정보를 가지고 있는 Instance, 유니티의 싱글톤 Manager 처럼 사용중*/
 	UFUNCTION(BlueprintCallable)
 	FInventoryItemData GetItemData(const int32 itemID);
 
 
 
 protected:
+	/* 아이템의 데이터를 담은 DataTable 에디터에서 설정. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Data", meta = (AllowPrivateAccess = "true"))
 	class UDataTable* itemData;
 

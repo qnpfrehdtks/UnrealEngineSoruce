@@ -89,7 +89,7 @@ float UBlockingState::Damaged(EAttackType dmgType, FVector dmgPosition, float DM
 	float currentStamina = OwnedPlayer->GetStamina();
 	float resultConsumeStamina = notBlockedDMG;
 
-	if (FSMRef->PushState_float(ECharacterState::ECS_Blocking, resultConsumeStamina) == false)
+	if (FSMRef->ChangeState_float(ECharacterState::ECS_Blocking, resultConsumeStamina) == false)
 	{
 		OwnedPlayer->consumeStamina(resultConsumeStamina);
 		float resultDmg = DMG - currentStamina;

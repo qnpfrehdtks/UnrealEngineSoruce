@@ -111,13 +111,16 @@ void ASpawnActor::OnSpawnActor()
 	for (int32 i = 0; i < SpawnCount; i++)
 	{
 		FActorSpawnParameters param;
-		param.Owner = this;
+		param.Owner = nullptr;
 
+		/* 바운딩 박스 크기에 랜덤 포인트를 찍어서 스폰*/
 		FVector randPos = UKismetMathLibrary::RandomPointInBoundingBox(SpawnBoxComponent->GetComponentLocation(), SpawnBoxComponent->GetScaledBoxExtent());
 
+		/* 방향도 랜덤 */
 		FRotator rot = UKismetMathLibrary::MakeRotator(0, 0, FMath::RandRange(0, 360));
 		AAICharacterBase* newActor = GetWorld()->SpawnActor<AAICharacterBase>(SpawnActor, randPos, rot, param);
 
+		/* 스폰 */
 
 		if (newActor == nullptr)
 		{

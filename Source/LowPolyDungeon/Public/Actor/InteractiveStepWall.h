@@ -9,6 +9,7 @@
 /**
  * 
  */
+/* 캐릭터랑 상호작용시 문을 엽니다. */
 UCLASS()
 class LOWPOLYDUNGEON_API AInteractiveStepWall : public AInteractiveActorBase
 {
